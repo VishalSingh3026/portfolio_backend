@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-backend",
+  "version": "1.0.0",
+  "main": "api/contact.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "mongodb": "^5.8.0"
+  }
+}
