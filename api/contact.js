@@ -1,30 +1,32 @@
 // api/contact.js
-const { MongoClient } = require("mongodb");
+import mongoose from "mongoose";
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+const connectDB = async () => {
+  if (mongoose.connections[0].readyState) return;
+  await mongoose.connect(process.env.MONGODB_URI);
+};
+
+const contactSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  mobile: String,
+  subject: String,
+  message: String,
+  createdAt: { type: Date, default: Date.now },
+});
+
+const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSchema);
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ message: "Missing fields" });
-  }
+  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
   try {
-    await client.connect();
-    const db = client.db("portfolio");
-    const collection = db.collection("contacts");
-
-    await collection.insertOne({ name, email, message, timestamp: new Date() });
-
-    return res.status(200).json({ message: "Message received!" });
+    await connectDB();
+    const contact = new Contact(req.body);
+    await contact.save();
+    res.status(200).json({ message: "Message received successfully!" });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Failed to submit message" });
   }
 }

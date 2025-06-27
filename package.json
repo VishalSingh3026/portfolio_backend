@@ -6,6 +6,8 @@
     "start": "vercel dev"
   },
   "dependencies": {
-    "mongodb": "^5.8.0"
+    "dotenv": "^16.6.0",
+    "mongodb": "^5.8.0",
+    "mongoose": "^8.16.1"
   }
 }
