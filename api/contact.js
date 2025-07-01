@@ -2,8 +2,14 @@
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-  if (mongoose.connections[0].readyState) return;
-  await mongoose.connect(process.env.MONGODB_URI);
+  try {
+    if (mongoose.connections[0].readyState) return;
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ MongoDB connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error);
+    throw new Error("Failed to connect to MongoDB");
+  }
 };
 
 const contactSchema = new mongoose.Schema({
@@ -45,7 +51,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ message: "Message received successfully!" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error in handler:", err);
     res.status(500).json({ error: "Failed to submit message" });
   }
 }
